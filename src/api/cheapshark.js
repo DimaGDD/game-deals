@@ -15,6 +15,7 @@ export async function fetchDeals({
     storeID = undefined,
     metacritic = undefined,
     steamRating = undefined,
+    AAA = undefined,
 } = {}) {
     const params = {
         title,
@@ -42,6 +43,10 @@ export async function fetchDeals({
 
     if (steamRating !== undefined && steamRating > 0) {
         params.steamRating = steamRating
+    }
+
+    if (AAA !== undefined) {
+        params.AAA = AAA
     }
 
     const { data } = await axios.get(`${BASE}/deals`, { params })

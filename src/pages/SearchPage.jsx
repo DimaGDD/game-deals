@@ -118,18 +118,3 @@ export default function SearchPage() {
         </div>
     )
 }
-
-
-function sortDeals(deals, order) {
-    const dir = order === 'desc' ? -1 : 1
-    const sorted = [...deals].sort((a, b) => {
-        const va = parseFloat(a.salePrice)
-        const vb = parseFloat(b.salePrice)
-
-        if (va < vb) return -1 * dir
-        if (va > vb) return 1 * dir
-        return 0
-    })
-
-    return sorted
-}
