@@ -12,10 +12,18 @@ export default function SearchPage() {
     const [page, setPage] = useState(0)
     const [filters, setFilters] = useState({
         title: '',
-        upperPrice: 50,
-        sortBy: 'Deal Rating',
+        lowerPrice: 0,
+        upperPrice: 200,
+        sortBy: 'Price',
         order: 'asc',
+        onSale: 1,
+        storeID: '',
     })
+
+    const isMetacritic = filters.sortBy === 'Metacritic'
+    const isReviews = filters.sortBy === 'Reviews'
+
+    const invertDesc = isMetacritic || isReviews
 
     useEffect(() => {
         fetchStores()
@@ -24,19 +32,24 @@ export default function SearchPage() {
     }, [])
 
     useEffect(() => {
-        setLoading(true)
         fetchDeals({
             title: filters.title,
+            lowerPrice: filters.lowerPrice,
             upperPrice: filters.upperPrice,
             sortBy: filters.sortBy,
-            pageSize: 60,
+            pageSize: 24,
             pageNumber: page,
+            desc: invertDesc
+                    ? (filters.order === 'asc' ? 1 : 0)
+                    : (filters.order === 'desc' ? 1 : 0),
+            onSale: filters.onSale,
+            storeID: filters.storeID || undefined,
+            metacritic: filters.sortBy === 'Metacritic' ? 1 : undefined,
+            steamRating: filters.sortBy === 'Reviews' ? 1: undefined,
          })
             .then((data) => {
                 const list = Array.isArray(data) ? data : []
-                const withDiscount = list.filter((d) => parseFloat(d.savings) > 0)
-
-                setDeals(sortDeals(withDiscount, filters.sortBy, filters.order))
+                setDeals(list)
                 setError(null)
             })
             .catch((err) => {
@@ -47,15 +60,21 @@ export default function SearchPage() {
     }, [filters, page])
 
     const handleApplyFilters = useCallback((newFilters) => {
+        setLoading(true)
         setPage(0)
         setFilters(newFilters)
     }, [])
+
+    const handlePageChange = (nextPage) => {
+        setLoading(true)
+        setPage(nextPage)
+    }
 
     return (
         <div className="max-w-6xl mx-auto p-6">
             <h2 className="text-2xl font-bold mb-6">Скидки на игры</h2>
 
-            <Filters onApply={handleApplyFilters} loading={loading} />
+            <Filters onApply={handleApplyFilters} loading={loading} stores={stores}/>
 
             {error && <div className="text-red-400 mb-4">Ошибка: {error}</div>}
 
@@ -74,7 +93,7 @@ export default function SearchPage() {
             {deals.length > 0 && (
                 <div className="flex items-center justify-center gap-4 mt-8">
                     <button
-                        onClick={() => setPage((p) => Math.max(0, p - 1))}
+                        onClick={() => handlePageChange(Math.max(0, page - 1))}
                         disabled={page === 0 || loading}
                         className="px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
                     >
@@ -84,7 +103,7 @@ export default function SearchPage() {
                     <span className="text-slate-400">Страница {page + 1}</span>
 
                     <button
-                        onClick={() => setPage((p) => p + 1)}
+                        onClick={() => handlePageChange(page + 1)}
                         disabled={loading || deals.length < 24}
                         className="px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
                     >
@@ -101,63 +120,11 @@ export default function SearchPage() {
 }
 
 
-function sortDeals(deals, sortBy, order) {
-    console.warn('sortDeals вызвана:', {
-        count: deals.length,
-        sortBy,
-        order,
-        firstThreeMetacritic: deals.slice(0, 3).map(d => d.metacriticScore),
-    })
-
+function sortDeals(deals, order) {
     const dir = order === 'desc' ? -1 : 1
     const sorted = [...deals].sort((a, b) => {
-        let va, vb
-        switch (sortBy) {
-            case 'Price':
-                va = parseFloat(a.salePrice)
-                vb = parseFloat(b.salePrice)
-                break
-            case 'Metacritic':
-                va = parseFloat(a.metacriticScore) || 0
-                vb = parseFloat(b.metacriticScore) || 0
-
-                if (va === 0 && vb === 0) return 0
-                if (va === 0) return 1
-                if (vb === 0) return -1
-
-                break
-            case 'Release':
-                va = parseFloat(a.releaseDate) || 0
-                vb = parseFloat(b.releaseDate) || 0
-                break
-            case 'Savings':
-                va = parseFloat(a.savings)
-                vb = parseFloat(b.savings)
-
-                if (va === 0 && vb === 0) return 0
-                if (va === 0) return 1
-                if (vb === 0) return -1
-                
-                break
-            case 'Reviews':
-                va = parseFloat(a.steamRatingPercent) || 0
-                vb = parseFloat(b.steamRatingPercent) || 0
-
-                if (va === 0 && vb === 0) return 0
-                if (va === 0) return 1
-                if (vb === 0) return -1
-
-                break
-            case 'Deal Rating':
-                va = parseFloat(a.dealRating) || 0
-                vb = parseFloat(b.dealRating) || 0
-
-                if (va === 0 && vb === 0) return 0
-                if (va === 0) return 1
-                if (vb === 0) return -1
-
-                break
-        }
+        const va = parseFloat(a.salePrice)
+        const vb = parseFloat(b.salePrice)
 
         if (va < vb) return -1 * dir
         if (va > vb) return 1 * dir

@@ -5,11 +5,16 @@ const BASE = 'https://www.cheapshark.com/api/1.0'
 
 export async function fetchDeals({
     title = '',
-    upperPrice = 50,
+    upperPrice = 200,
     lowerPrice = 0,
-    sortBy = 'Deal Rating',
-    pageSize = 60,
+    sortBy = 'Price',
+    pageSize = 24,
     pageNumber = 0,
+    desc = 0,
+    onSale = 1,
+    storeID = undefined,
+    metacritic = undefined,
+    steamRating = undefined,
 } = {}) {
     const params = {
         title,
@@ -18,6 +23,20 @@ export async function fetchDeals({
         sortBy,
         pageSize,
         pageNumber,
+        desc,
+        onSale,
+    }
+
+    if (storeID !== undefined && storeID !== '') {
+        params.storeID = storeID
+    }
+
+    if (metacritic !== undefined && metacritic > 0) {
+        params.metacritic = metacritic
+    }
+
+    if (steamRating !== undefined && steamRating > 0) {
+        params.steamRating = steamRating
     }
 
     const { data } = await axios.get(`${BASE}/deals`, { params })
