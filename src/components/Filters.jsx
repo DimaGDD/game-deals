@@ -87,10 +87,35 @@ export default function Filters({ onApply, loading, stores = {} }) {
         }
     }
 
+    const resetFilters = () => {
+        setTitle('')
+        setSortBy('Price')
+        setOrder('asc')
+        setOnSale(true)
+        setStoreID('')
+
+        setMinPrice(DEFAULT_MIN)
+        setMaxPrice(DEFAULT_MAX)
+        setMinDraft(String(DEFAULT_MIN))
+        setMaxDraft(String(DEFAULT_MAX))
+
+        minRef.current = DEFAULT_MIN
+        maxRef.current = DEFAULT_MAX
+
+        onApply({
+            title: '',
+            lowerPrice: DEFAULT_MIN,
+            upperPrice: DEFAULT_MAX,
+            sortBy: 'Price',
+            order: 'asc',
+            onSale: 1,
+            storeID: '',
+        })
+    }
+
     return (
         <div className="bg-slate-800 border border-slate-700 rounded-xl p-5 mb-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {/* Название */}
                 <div>
                     <label className="block text-sm text-slate-400 mb-1">
                         Название игры
@@ -105,7 +130,6 @@ export default function Filters({ onApply, loading, stores = {} }) {
                     />
                 </div>
 
-                {/* Цена от */}
                 <div>
                     <label className="block text-sm text-slate-400 mb-1">
                         Цена от
@@ -123,7 +147,6 @@ export default function Filters({ onApply, loading, stores = {} }) {
                     />
                 </div>
 
-                {/* Цена до */}
                 <div>
                     <label className="block text-sm text-slate-400 mb-1">
                         Цена до
@@ -141,7 +164,6 @@ export default function Filters({ onApply, loading, stores = {} }) {
                     />
                 </div>
 
-                {/* Магазин */}
                 <div>
                     <label className="block text-sm text-slate-400 mb-1">
                         Магазин
@@ -161,7 +183,6 @@ export default function Filters({ onApply, loading, stores = {} }) {
                     </select>
                 </div>
 
-                {/* Сортировка */}
                 <div>
                     <label className="block text-sm text-slate-400 mb-1">
                         Сортировка
@@ -180,7 +201,6 @@ export default function Filters({ onApply, loading, stores = {} }) {
                     </select>
                 </div>
 
-                {/* Порядок */}
                 <div>
                     <label className="block text-sm text-slate-400 mb-1">
                         Порядок
@@ -214,7 +234,6 @@ export default function Filters({ onApply, loading, stores = {} }) {
                 </div>
             </div>
 
-            {/* Нижняя панель: чекбокс + кнопка */}
             <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer select-none">
                     <input
@@ -233,6 +252,15 @@ export default function Filters({ onApply, loading, stores = {} }) {
                     className="w-full sm:w-auto h-10 px-5 rounded-lg bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer font-medium"
                 >
                     {loading ? 'Обновление...' : 'Применить фильтры'}
+                </button>
+
+                <button
+                    type="button"
+                    onClick={resetFilters}
+                    disabled={loading}
+                    className="w-full sm:w-auto h-10 px-5 rounded-lg bg-slate-700 hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer font-medium text-slate-200"
+                >
+                    Сбросить фильтры
                 </button>
             </div>
         </div>
