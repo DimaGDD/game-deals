@@ -5,8 +5,8 @@ const BASE = 'https://www.cheapshark.com/api/1.0'
 
 export async function fetchDeals({
     title = '',
-    upperPrice = 200,
-    lowerPrice = 0,
+    upperPrice = undefined,
+    lowerPrice = undefined,
     sortBy = 'Price',
     pageSize = 24,
     pageNumber = 0,
@@ -18,13 +18,18 @@ export async function fetchDeals({
 } = {}) {
     const params = {
         title,
-        upperPrice,
-        lowerPrice,
         sortBy,
         pageSize,
         pageNumber,
         desc,
         onSale,
+    }
+
+    if (upperPrice !== undefined && upperPrice !== null && upperPrice !== '') {
+        params.upperPrice = upperPrice
+    }
+    if (lowerPrice !== undefined && lowerPrice !== null && lowerPrice !== '') {
+        params.lowerPrice = lowerPrice
     }
 
     if (storeID !== undefined && storeID !== '') {

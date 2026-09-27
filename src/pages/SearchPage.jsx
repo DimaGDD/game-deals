@@ -13,7 +13,7 @@ export default function SearchPage() {
     const [filters, setFilters] = useState({
         title: '',
         lowerPrice: 0,
-        upperPrice: 200,
+        upperPrice: 0,
         sortBy: 'Price',
         order: 'asc',
         onSale: 1,
@@ -34,8 +34,8 @@ export default function SearchPage() {
     useEffect(() => {
         fetchDeals({
             title: filters.title,
-            lowerPrice: filters.lowerPrice,
-            upperPrice: filters.upperPrice,
+            lowerPrice: filters.lowerPrice || undefined,
+            upperPrice: filters.upperPrice > 0 ? filters.upperPrice : undefined,
             sortBy: filters.sortBy,
             pageSize: 24,
             pageNumber: page,
