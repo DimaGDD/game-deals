@@ -97,7 +97,7 @@ export default function SearchPage() {
                         disabled={page === 0 || loading}
                         className="px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
                     >
-                        ← Назада
+                        ← Назад
                     </button>
 
                     <span className="text-slate-400">Страница {page + 1}</span>
@@ -107,7 +107,7 @@ export default function SearchPage() {
                         disabled={loading || deals.length < 24}
                         className="px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
                     >
-                        Впереда →
+                        Вперед →
                     </button>
                 </div>
             )}
